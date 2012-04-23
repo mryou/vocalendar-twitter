@@ -15,7 +15,7 @@ require 'pp'
 
 
 # Proxy設定（不要なら、proxy_hostをnilに設定
-proxy_host = '';
+proxy_host = nil;
 proxy_port = 8080;
 
 # 認証設定
@@ -30,12 +30,16 @@ Net::HTTP.version_1_2;
 # 現在時間、いつからいつまでの予定を呟き対象とするかの時間
 now = DateTime.now()
 totime = now + Rational(1, 24) * 4
-fromtime = totime - Rational(1, 24 * 60 ) * 9
+fromtime = totime - Rational(1, 24 * 60 ) * 10
 
+puts '----- start -----'
+puts now
+puts fromtime
+puts totime
 
 # カレンダーの予定の取得条件
 # 左から、開始時刻順、現在時刻からの予定、昇順、繰り返し予定を1つずつ取得
-query_hash = { 'orderby' => 'starttime', 'start-min' => now.strftime('%FT%T'), 'sortorder' => 'a', 'singleevents' => 'true'};
+query_hash = { 'orderby' => 'starttime', 'start-min' => now.new_offset.strftime('%FT%T'), 'sortorder' => 'a', 'singleevents' => 'true'};
 query_string = query_hash.map{ |key,value|
 	"#{URI.encode(key)}=#{URI.encode(value)}" }.join("&");
 
@@ -102,7 +106,7 @@ document.elements.each('feed/entry') do |entry|
 	puts starttime;
 	puts url;
 
-	if fromtime < starttime and starttime < totime then
+	if fromtime < starttime and starttime <= totime then
 
 		tweetsStr = nil;
 		puts 'つぶやき対象';
